@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Timetable</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family: 'Poppins', sans-serif;
+    background-color:#f5f5f7;
+    text-align:center;
+}
+
+h1{
+    color:#444;
+}
+
+table{
+    margin:auto;
+    border-collapse:collapse;
+    width:80%;
+    background:#ffffff;
+}
+
+caption{
+    font-size:20px;
+    padding:10px;
+    font-weight:500;
+    color:#555;
+}
+
+th, td{
+    border:1px solid #ddd;
+    padding:12px;
+}
+
+thead{
+    background-color:#dfe7fd;
+}
+
+tbody tr:nth-child(even){
+    background-color:#f3f4f6;
+}
+
+tfoot{
+    background-color:#e9ecef;
+    font-style:italic;
+}
+
+.break{
+    background:#f8edeb;
+    font-weight:500;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>College Weekly Timetable 📚</h1>
+
+<table>
+
+<caption>B.Tech CSE - Semester Timetable</caption>
+
+<thead>
+<tr>
+<th>Day</th>
+<th>9-10</th>
+<th>10-11</th>
+<th>11-12</th>
+<th>12-1</th>
+<th>2-3</th>
+<th>3-4</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>Monday</td>
+<td>Maths</td>
+<td>Physics</td>
+<td>HTML</td>
+<td rowspan="5" class="break">Lunch Break 🍱</td>
+<td colspan="2">Web Designing Lab</td>
+</tr>
+
+<tr>
+<td>Tuesday</td>
+<td>Maths</td>
+<td>English</td>
+<td>Programming</td>
+<td>DBMS</td>
+<td>Sports</td>
+</tr>
+
+<tr>
+<td>Wednesday</td>
+<td colspan="2">Coding Lab</td>
+<td>Maths</td>
+<td>Physics</td>
+<td>Library</td>
+</tr>
+
+<tr>
+<td>Thursday</td>
+<td>English</td>
+<td>Programming</td>
+<td>DBMS</td>
+<td colspan="2">Project Work</td>
+</tr>
+
+<tr>
+<td>Friday</td>
+<td>Maths</td>
+<td>Physics</td>
+<td>HTML</td>
+<td>Seminar</td>
+<td>Club Activity</td>
+</tr>
+
+</tbody>
+
+<tfoot>
+<tr>
+<td colspan="7">* Timetable created for HTML5 Table Practice</td>
+</tr>
+</tfoot>
+
+</table>
+
+</body>
+</html>
