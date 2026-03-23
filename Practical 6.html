@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Seminar Registration Form</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(to right, #dfe9f3, #ffffff);
+}
+
+h1{
+    text-align:center;
+    color:#0a2a66;
+}
+
+form{
+    width:550px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0px 0px 10px gray;
+}
+
+fieldset{
+    border:2px solid #0a2a66;
+    margin-bottom:15px;
+}
+
+legend{
+    font-weight:bold;
+    color:#0a2a66;
+}
+
+input, select{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+    margin-bottom:15px;
+}
+
+.interest{
+    width:auto;
+}
+
+button{
+    background:#0a2a66;
+    color:white;
+    padding:10px;
+    width:100%;
+    border:none;
+    font-size:16px;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#1c4ed8;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>✨ Future Tech Seminar Registration ✨</h1>
+
+<form>
+
+<fieldset>
+<legend>Personal Details</legend>
+
+<label>Full Name:</label>
+<input type="text" value="Arya Dharamthoke">
+
+<label>Email:</label>
+<input type="email" value="aryadharamthoke@2256.com">
+
+<label>Phone Number:</label>
+<input type="tel" value="8673921146">
+
+<label>City:</label>
+<input type="text" value="Nagpur">
+
+<label>College Name:</label>
+<input type="text" value="JD College of Engineering and Management">
+
+</fieldset>
+
+
+<fieldset>
+<legend>Academic Information</legend>
+
+<label>Branch:</label>
+<select>
+<option>CSE</option>
+<option>CSE (AI & ML)</option>
+<option>IT</option>
+<option>ENTC</option>
+<option>Mechanical</option>
+<option>Civil</option>
+<option>Electrical</option>
+</select>
+
+<label>Year:</label>
+<select>
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+<option>4th Year</option>
+</select>
+
+<label>Gender:</label><br>
+<input type="radio" name="gender" class="interest"> Female
+<input type="radio" name="gender" class="interest"> Male
+<input type="radio" name="gender" class="interest"> Prefer not to say
+
+</fieldset>
+
+
+<fieldset>
+<legend>Area of Interest</legend>
+
+<input type="checkbox" class="interest"> Robotics<br>
+<input type="checkbox" class="interest"> Artificial Intelligence<br>
+<input type="checkbox" class="interest"> Machine Learning<br>
+<input type="checkbox" class="interest"> Web Development<br>
+<input type="checkbox" class="interest"> Cyber Security<br>
+<input type="checkbox" class="interest"> Data Science<br>
+<input type="checkbox" class="interest"> Cloud Computing<br>
+<input type="checkbox" class="interest"> App Development<br>
+<input type="checkbox" class="interest"> Internet of Things (IoT)<br>
+<input type="checkbox" class="interest"> Blockchain<br>
+
+</fieldset>
+
+
+<fieldset>
+<legend>Seminar Schedule</legend>
+
+<label>Select Seminar Date:</label>
+<select>
+<option>10 April 2026</option>
+<option>15 April 2026</option>
+<option>20 April 2026</option>
+<option>25 April 2026</option>
+</select>
+
+</fieldset>
+
+<button type="submit">Register</button>
+
+</form>
+
+</body>
+</html>
