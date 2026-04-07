@@ -1,0 +1,134 @@
+<!-- index.html --><!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry Potter Gallery</title><!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+    }
+
+    h1 {
+        text-align: center;
+        padding: 25px;
+        font-family: 'Cinzel', serif;
+        font-size: 2.8rem;
+        letter-spacing: 2px;
+        background: linear-gradient(to right, #ffd700, #ffcc70);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        padding: 25px;
+    }
+
+    .box {
+        overflow: hidden;
+        border-radius: 15px;
+        position: relative;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease, filter 0.6s ease;
+    }
+
+    /* Hover Effects */
+    .box:hover {
+        transform: scale(1.07) rotate(1deg);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    }
+
+    .box:hover img {
+        transform: scale(1.2);
+        filter: brightness(0.7) contrast(1.2);
+    }
+
+    /* Magical Glow Border */
+    .box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 15px;
+        padding: 2px;
+        background: linear-gradient(45deg, gold, purple, cyan);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: 0.4s;
+    }
+
+    .box:hover::before {
+        opacity: 1;
+    }
+
+    /* Overlay */
+    .box::after {
+        content: "✨ View Magic";
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        background: linear-gradient(45deg, #ff7e5f, #feb47b);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: 0.4s;
+    }
+
+    .box:hover::after {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+</style>
+
+</head>
+<body><h1>⚡ Harry Potter Gallery ⚡</h1>
+
+<div class="gallery">
+    <div class="box">
+        <img src="https://wallpaperaccess.com/full/541378.jpg">
+    </div>
+    <div class="box">
+        <img src="https://wallpaperaccess.com/full/541575.jpg">
+    </div>
+    <div class="box">
+        <img src="https://jedmark.co.uk/wp-content/uploads/2019/02/harry-potter-wand-collection.jpg">
+    </div>
+    <div class="box">
+        <img src="https://img1.etsystatic.com/127/0/10140668/il_fullxfull.1081637973_e4b6.jpg">
+    </div>
+    <div class="box">
+        <img src="https://i.etsystatic.com/27546725/r/il/968316/3298198029/il_fullxfull.3298198029_b69b.jpg">
+    </div>
+    <div class="box">
+        <img src="https://i.pinimg.com/736x/4e/ae/16/4eae16439b099c6bac6e6cb391286a3e.jpg">
+    </div>
+    <div class="box">
+        <img src="https://fantasytopics.com/wp-content/uploads/2022/06/Complete-List-of-Harry-Potter-Characters.jpg">
+    </div>
+    <div class="box">
+        <img src="https://th.bing.com/th/id/R.18e37a00cd30b63b7c9538814a663c13?rik=3u3ZcjmykshIqA&riu=http%3a%2f%2fcdn.playbuzz.com%2fcdn%2fd8dd21b0-93c5-42ac-8747-807d82e513f5%2ff97f8c65-56bc-41e4-8cab-5912a3548d15.jpg&ehk=Vo4zrobWnJyqBPXLt6os4r%2fKC567x17ewSBFP3FJeS0%3d&risl=&pid=ImgRaw&r=0">
+    </div>
+
+
+
+</body>
+</html>
