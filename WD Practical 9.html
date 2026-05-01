@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DhruviJE: Fine Dining</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* General Styling */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #fff8f0;
+}
+/* Header */
+header {
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    color: white;
+    text-align: center;
+    padding: 30px;
+    animation: fadeIn 2s ease-in;
+}
+header h1 {
+    font-size: 3em;
+}
+nav {
+    display: flex;
+    justify-content: center;
+    background: #333;
+}
+nav a {
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+}
+nav a:hover {
+    background: #ff4b2b;
+.hero {
+    text-align: center;
+    padding: 60px;
+    background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') no-repeat center/cover;
+    color: white;
+    animation: slideIn 2s ease;
+}
+.hero h2 {
+    font-size: 2.5em;
+}
+/* Button Animation */
+.btn {
+    background: #ff4b2b;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn:hover {
+    transform: scale(1.2) rotate(3deg);
+}
+/* Services (Icons) */
+.services {
+    display: flex;
+    justify-content: space-around;
+    padding: 40px;
+    text-align: center;
+}
+.services i {
+    font-size: 40px;
+    color: #ff4b2b;
+    margin-bottom: 10px;
+    animation: bounce 2s infinite;
+}
+.menu {
+    padding: 60px 20px;
+    background: linear-gradient(to right, #fff1eb, #ffe0d6);
+}
+.menu-title {
+    text-align: center;
+    font-size: 2.5em;
+    color: #ff416c;
+    margin-bottom: 40px;
+}
+/* FLEX COLUMNS */
+.menu-container {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+}
+/* COLUMN */
+.menu-column {
+    width: 45%;
+}
+/* CATEGORY CARD */
+.category {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    transition: 0.3s;
+}
+/* HOVER EFFECT */
+.category:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+.category h3 {
+    color: #ff4b2b;
+    margin-bottom: 15px;
+}
+/* MENU LIST */
+.category ul {
+    list-style: none;
+    padding: 0;
+}
+.category li {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #ddd;
+}
+.category li span {
+    font-weight: bold;
+}
+/* ================= FOOD CARDS ================= */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 40px;
+}
+.card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    transition: 0.3s;
+}
+.card img {
+    width: 100%;
+}
+.card:hover {
+    transform: scale(1.1) translateY(-10px);
+}
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #333;
+    color: white;
+}
+/* Animations */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@keyframes slideIn {
+    from {transform: translateX(-100%);}
+    to {transform: translateX(0);}
+}
+@keyframes bounce {
+    0%, 100% {transform: translateY(0);}
+    50% {transform: translateY(-10px);}
+}
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+    .services {
+        flex-direction: column;
+    }
+
+    .menu-container {
+        flex-direction: column;
+    }
+    .menu-column {
+        width: 100%;
+    }
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>DhruviJE</h1>
+    <p>Delicious Food, Happy Mood 🍽️</p>
+</header>
+<nav>
+    <a href="#">Home</a>
+    <a href="#">Menu</a>
+    <a href="#">Services</a>
+    <a href="#">Contact</a>
+</nav>
+<section class="hero">
+    <h2>Welcome to DhruviJE Restaurant</h2>
+    <button class="btn">Order Now</button>
+</section>
+<!-- Services -->
+<section class="services">
+    <div>
+        <i class="fas fa-utensils"></i>
+        <h3>Dine-In</h3>
+    </div>
+    <div>
+        <i class="fas fa-truck"></i>
+        <h3>Delivery</h3>
+    </div>
+    <div>
+        <i class="fas fa-motorcycle"></i>
+        <h3>Takeaway</h3>
+    </div>
+</section>
+<!-- 🔥 MENU -->
+<section class="menu">
+    <h2 class="menu-title">Our Menu</h2>
+    <div class="menu-container">
+        <div class="menu-column">
+            <div class="category">
+                <h3>☕ Beverages</h3>
+                <ul>
+                    <li>Espresso <span>₹80</span></li>
+                    <li>Cappuccino <span>₹120</span></li>
+                    <li>Latte <span>₹130</span></li>
+                    <li>Cold Coffee <span>₹150</span></li>
+                    <li>Iced Tea <span>₹100</span></li>
+                    <li>Masala Chai <span>₹60</span></li>
+                </ul>
+            </div>
+            <div class="category">
+                <h3>🥪 Snacks</h3>
+                <ul>
+                    <li>Veg Sandwich <span>₹120</span></li>
+                    <li>Grilled Cheese <span>₹140</span></li>
+                    <li>Veg Burger <span>₹150</span></li>
+                    <li>French Fries <span>₹100</span></li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="menu-column">
+            <div class="category">
+                <h3>🍕 Quick Meals</h3>
+                <ul>
+                    <li>Margherita Pizza <span>₹180</span></li>
+                    <li>Farmhouse Pizza <span>₹220</span></li>
+                    <li>Pasta <span>₹200</span></li>
+                    <li>Veg Roll <span>₹150</span></li>
+                </ul>
+            </div>
+            <div class="category">
+                <h3>🍰 Desserts</h3>
+                <ul>
+                    <li>Chocolate Cake <span>₹120</span></li>
+                    <li>Brownie <span>₹160</span></li>
+                    <li>Ice Cream <span>₹80</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Food Cards -->
+<section class="cards">
+    <div class="card">
+        <img src="https://encrypted
+tbn0.gstatic.com/images?q=tbn:ANd9GcTSlPGHyAgKHvQbuFX8wxycZAUFmZr3Ed8eQw&s">
+        <h3>Pizza</h3>
+    </div>
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1550547660-d9450f859349">
+        <h3>Burger</h3>
+    </div>
+    <div class="card">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMWFhUXGRYYGBcYG=">
+        <h3>Pasta</h3>
+    </div>
+</section>
+<footer>
+    <p>© 2026 DhruviJE Restaurant</p>
+</footer>
+</body>
+</html>
