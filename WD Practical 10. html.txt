@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Explore Haryana</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    color: white;
+    background-color: #111;
+}
+
+/* --- BACKGROUND SLIDER --- */
+.bg-slider {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.bg-slider img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    animation: slideShow 18s infinite ease-in-out;
+}
+
+.bg-slider img:nth-child(1) { animation-delay: 0s; }
+.bg-slider img:nth-child(2) { animation-delay: 6s; }
+.bg-slider img:nth-child(3) { animation-delay: 12s; }
+
+@keyframes slideShow {
+    0% { opacity: 0; transform: scale(1); }
+    10% { opacity: 1; } 
+    33% { opacity: 1; } 
+    43% { opacity: 0; transform: scale(1.1); } 
+    100% { opacity: 0; }
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    z-index: -1;
+}
+
+.hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 60px;
+    color: #ffd700;
+    text-shadow: 2px 2px 15px rgba(0,0,0,0.7);
+    animation: fadeIn 2s ease-in-out;
+}
+
+.hero p {
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    padding: 40px 0;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.5s;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.card.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card:hover {
+    transform: scale(1.03);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+h2 {
+    color: #ffcc00;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+    border-radius: 15px;
+}
+
+.creator-img {
+    width: 100%;
+    height: 250px;
+    border-radius: 15px;
+    object-fit: cover;
+    margin-top: 10px;
+    border: 3px solid #ffcc00;
+    transition: 0.4s;
+}
+
+ul {
+    line-height: 1.8;
+    font-size: 17px;
+    list-style: none;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND IMAGES -->
+<div class="bg-slider">
+    <img src="https://www.tourmyindia.com/blog//wp-content/uploads/2021/04/Neemrana-Fort-Palace.jpg">
+    <img src="https://media-cdn.tripadvisor.com/media/photo-s/04/92/08/10/morni-hills.jpg">
+</div>
+
+<section class="hero">
+    <div>
+        <h1>🌾 Explore Haryana</h1>
+        <p>Culture • History • Nature • Pride of India</p>
+    </div>
+</section>
+
+<div class="container">
+
+    <div class="card">
+        <h2>About Haryana</h2>
+        <p style="text-align: center;">
+            Haryana is a vibrant state in northern India known for its agriculture,
+            rich history, and strong cultural traditions.
+        </p>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+            <h2>📍 Location</h2>
+            <iframe src="https://www.google.com/maps?q=Haryana&output=embed"></iframe>
+        </div>
+
+        <div class="card">
+            <h2>🎥 Explore Video</h2>
+            <iframe id="videoFrame" 
+            src="https://www.youtube.com/embed/wif-lYIYiQE?enablejsapi=1&mute=1">
+            </iframe>
+        </div>
+
+        <div class="card">
+            <h2>📚 Wikipedia</h2>
+            <p style="text-align: center; margin-bottom: 10px;">
+                Learn more about Haryana from Wikipedia:
+            </p>
+            <iframe src="https://en.wikipedia.org/wiki/Haryana"></iframe>
+        </div>
+
+        <div class="card">
+            <h2>🔥 Biggest Creator from Haryana</h2>
+            <img src="https://uploads.onecompiler.io/44myze9qt/44myvjxwj/Screenshot%202026-05-01%20184033.png" class="creator-img">
+            <p style="margin-top:10px; text-align:center;">
+                The Legendary Creator 😎
+                Rajgourav_hindu
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <h2>🏞️ Famous Places</h2>
+        <ul>
+          <li>🏹 Sirsa – Land of creator</li>
+            <li>🏹 Kurukshetra – Land of Mahabharata</li>
+            <li>⛰️ Morni Hills – Scenic beauty</li>
+            <li>🐦 Sultanpur National Park – Bird sanctuary</li>
+            <li>⚔️ Panipat – Historic battlefield</li>
+            <li>🌸 Pinjore Gardens – Mughal style garden</li>
+<li>🛕 Brahma Sarovar – Holy lake</li>
+<li>🐆 Kalesar National Park – Wildlife sanctuary</li>
+<li>🚣 Damdama Lake – Adventure & boating</li>
+<li>🛕 Sheetla Mata Mandir – Religious place</li>
+<li>🏛️ Rakhigarhi – Ancient civilization site</li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+const cards = document.querySelectorAll('.card');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            entry.target.classList.add('show');
+        }
+    });
+}, { threshold: 0.1 });
+
+cards.forEach(card => observer.observe(card));
+
+let videoStarted = false;
+window.addEventListener('scroll', () => {
+    const video = document.getElementById("videoFrame");
+    const rect = video.getBoundingClientRect();
+
+    if(rect.top >= 0 && rect.bottom <= window.innerHeight && !videoStarted){
+        video.src += "&autoplay=1";
+        videoStarted = true;
+    }
+});
+</script>
+
+</body>
+</html>
