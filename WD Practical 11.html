@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Lost &amp; Found Locator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+/* =============================================
+   CSS VARIABLES & RESET
+   ============================================= */
+:root {
+  --bg-deep:       #fff7f0;
+  --bg-mid:        #ffffff;
+  --bg-panel:      rgba(255,255,255,0.85);
+  --glass:         rgba(255,255,255,0.70);
+  --glass-border:  rgba(180,80,255,0.18);
+  --teal:          #00c2ff;
+  --teal-dim:      rgba(0,194,255,0.15);
+  --amber:         #ff9500;
+  --amber-dim:     rgba(255,149,0,0.15);
+  --red:           #ff2d55;
+  --red-dim:       rgba(255,45,85,0.12);
+  --green:         #00c853;
+  --green-dim:     rgba(0,200,83,0.13);
+  --text-1:        #1a0035;
+  --text-2:        #6b3fa0;
+  --text-3:        #c4a8e8;
+  --radius:        14px;
+  --radius-sm:     8px;
+  --shadow:        0 8px 32px rgba(180,0,255,0.13);
+  --transition:    0.22s cubic-bezier(0.4,0,0.2,1);
+  --pink:          #ff2d8f;
+  --purple:        #a020f0;
+  --orange:        #ff6a00;
+  --yellow:        #ffe500;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated mesh background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 10%, rgba(255,45,143,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 88% 15%, rgba(0,194,255,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 80% 85%, rgba(255,106,0,0.16) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 85%, rgba(160,32,240,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 50% 50%, rgba(255,229,0,0.10) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Polka dot overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(160,32,240,0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =============================================
+   LAYOUT
+   ============================================= */
+.app-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+header {
+  padding: 32px 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 36px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--teal), #0099ff);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 20px rgba(0,229,195,0.4);
+  flex-shrink: 0;
+}
+
+.logo-text h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.logo-text h1 span { color: var(--teal); }
+
+.logo-text p {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  margin-top: 3px;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.stat-chip:hover { background: rgba(255,255,255,0.08); }
+
+.stat-chip .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+.stat-chip.lost .dot  { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+.stat-chip.found .dot { background: var(--teal);  box-shadow: 0 0 6px var(--teal); }
+.stat-chip.rec .dot   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+.stat-chip .count {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* =============================================
+   LOCATION BAR
+   ============================================= */
+.location-bar {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.location-bar .icon { font-size: 1.2rem; }
+
+.location-text {
+  flex: 1;
+  min-width: 150px;
+}
+
+.location-text .label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.location-text .value {
+  font-size: 0.9rem;
+  color: var(--text-1);
+  margin-top: 2px;
+}
+
+.btn-geo {
+  padding: 9px 18px;
+  background: var(--teal-dim);
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn-geo:hover {
+  background: var(--teal);
+  color: var(--bg-deep);
+}
+
+.btn-geo.loading { opacity: 0.6; pointer-events: none; }
+
+/* =============================================
+   MAIN GRID
+   ============================================= */
+.main-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media(max-width:900px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+
+/* =============================================
+   ITEMS PANEL
+   ============================================= */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(16px);
+}
+
+.panel-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-2);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--glass-border);
+}
+
+/* Draggable Item Cards */
+.item-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  cursor: grab;
+  transition: var(--transition);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--teal);
+  border-radius: 3px 0 0 3px;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.item-card:hover {
+  background: rgba(0,229,195,0.07);
+  border-color: rgba(0,229,195,0.3);
+  transform: translateX(4px);
+}
+
+.item-card:hover::before { opacity: 1; }
+
+.item-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  transform: scale(0.96);
+}
+
+.item-emoji { font-size: 1.5rem; flex-shrink: 0; }
+
+.item-info .name {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.item-info .hint {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.drag-handle {
+  margin-left: auto;
+  color: var(--text-3);
+  font-size: 0.9rem;
+}
+
+/* =============================================
+   RIGHT COLUMN
+   ============================================= */
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* =============================================
+   DROP ZONES
+   ============================================= */
+.drop-zones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media(max-width:600px) {
+  .drop-zones { grid-template-columns: 1fr; }
+}
+
+.drop-zone {
+  min-height: 160px;
+  border-radius: var(--radius);
+  border: 2px dashed var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 20px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+.drop-zone-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.drop-zone-sub {
+  font-size: 0.75rem;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.drop-zone.lost {
+  background: rgba(255,77,109,0.04);
+  border-color: rgba(255,77,109,0.25);
+}
+
+.drop-zone.lost .drop-zone-label { color: var(--red); }
+.drop-zone.lost .drop-zone-icon { font-size: 2rem; filter: drop-shadow(0 0 8px var(--red)); }
+
+.drop-zone.found {
+  background: rgba(0,229,195,0.04);
+  border-color: rgba(0,229,195,0.25);
+}
+
+.drop-zone.found .drop-zone-label { color: var(--teal); }
+.drop-zone.found .drop-zone-icon { font-size: 2rem; filter: drop-shadow(0 0 8px var(--teal)); }
+
+.drop-zone.drag-over.lost {
+  background: var(--red-dim);
+  border-color: var(--red);
+  box-shadow: 0 0 30px rgba(255,77,109,0.15), inset 0 0 20px rgba(255,77,109,0.05);
+  transform: scale(1.01);
+}
+
+.drop-zone.drag-over.found {
+  background: var(--teal-dim);
+  border-color: var(--teal);
+  box-shadow: 0 0 30px rgba(0,229,195,0.15), inset 0 0 20px rgba(0,229,195,0.05);
+  transform: scale(1.01);
+}
+
+/* =============================================
+   REPORTS DASHBOARD
+   ============================================= */
+.dashboard {
+  background: var(--bg-panel);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(16px);
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  flex: 1;
+}
+
+/* Search bar */
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 160px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-2);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 9px 14px 9px 34px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+#searchInput::placeholder { color: var(--text-3); }
+
+#searchInput:focus {
+  border-color: var(--teal);
+  background: rgba(0,229,195,0.04);
+}
+
+/* Filter buttons */
+.filter-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  padding: 7px 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
+  color: var(--text-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
+
+.filter-btn.active[data-filter="all"] {
+  background: rgba(123,141,184,0.2);
+  border-color: var(--text-2);
+  color: var(--text-1);
+}
+
+.filter-btn.active[data-filter="lost"] {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.filter-btn.active[data-filter="found"] {
+  background: var(--teal-dim);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* Reports grid */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-2);
+}
+
+.empty-state .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+.empty-state p { font-size: 0.9rem; }
+
+/* Report Cards */
+.report-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+  animation: cardIn 0.35s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.report-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.report-card.lost::before  { background: linear-gradient(90deg, var(--red),  transparent); }
+.report-card.found::before { background: linear-gradient(90deg, var(--teal), transparent); }
+
+.report-card:hover {
+  border-color: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.report-card.recovered {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-emoji { font-size: 1.8rem; }
+
+.card-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.status-tag {
+  padding: 3px 10px;
+  border-radius: 40px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  flex-shrink: 0;
+}
+
+.status-tag.lost  { background: var(--red-dim);  color: var(--red);  border: 1px solid rgba(255,77,109,0.3); }
+.status-tag.found { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,229,195,0.3); }
+
+.card-desc {
+  font-size: 0.82rem;
+  color: var(--text-2);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
+  font-size: 0.7rem;
+  color: var(--text-2);
+}
+
+.badge svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+.card-contact {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-recovered {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid;
+  text-align: center;
+}
+
+.btn-recovered.mark {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.btn-recovered.mark:hover {
+  background: var(--green);
+  color: var(--bg-deep);
+}
+
+.btn-recovered.unmark {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--text-3);
+  color: var(--text-3);
+}
+
+.btn-recovered.unmark:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-2);
+}
+
+.btn-delete {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-3);
+}
+
+.btn-delete:hover {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.recovered-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: var(--green-dim);
+  border: 1px solid rgba(57,217,138,0.3);
+  border-radius: 40px;
+  font-size: 0.68rem;
+  color: var(--green);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-left: auto;
+}
+
+/* Match indicator */
+.match-indicator {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: rgba(255,184,48,0.08);
+  border: 1px solid rgba(255,184,48,0.25);
+  border-radius: var(--radius-sm);
+  font-size: 0.74rem;
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Image preview */
+.card-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  border: 1px solid var(--glass-border);
+}
+
+/* =============================================
+   MODAL
+   ============================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,10,20,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--bg-mid);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 28px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+  transform: scale(0.92) translateY(16px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+  opacity: 0;
+  position: relative;
+}
+
+.modal-overlay.open .modal {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.modal-emoji { font-size: 2rem; }
+
+.modal-header-text h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.modal-header-text p {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  margin-top: 3px;
+}
+
+.modal-type-tag {
+  margin-left: auto;
+  padding: 4px 12px;
+  border-radius: 40px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal-type-tag.lost  { background: var(--red-dim);  color: var(--red);  border: 1px solid rgba(255,77,109,0.3); }
+.modal-type-tag.found { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,229,195,0.3); }
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-2);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  transition: var(--transition);
+  outline: none;
+  resize: none;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: var(--text-3); }
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--teal);
+  background: rgba(0,229,195,0.04);
+}
+
+.form-group input[readonly] {
+  color: var(--text-2);
+  cursor: default;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.attach-loc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.attach-loc:hover { border-color: var(--teal); background: var(--teal-dim); }
+
+.attach-loc input[type="checkbox"] { accent-color: var(--teal); width: 16px; height: 16px; }
+
+.attach-loc span { font-size: 0.83rem; }
+
+/* File input */
+.file-upload-wrap {
+  position: relative;
+}
+
+.file-upload-wrap input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.file-upload-ui {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--glass);
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 0.83rem;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.file-upload-wrap:hover .file-upload-ui {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 12px;
+  background: var(--teal);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--bg-deep);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+  background: #00ffda;
+  box-shadow: 0 0 20px rgba(0,229,195,0.4);
+}
+
+.btn-cancel {
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-cancel:hover { background: rgba(255,255,255,0.06); color: var(--text-1); }
+
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 30px; height: 30px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: var(--text-2);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.modal-close:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+
+/* =============================================
+   TOAST NOTIFICATIONS
+   ============================================= */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  background: var(--bg-mid);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  min-width: 250px;
+  max-width: 360px;
+  pointer-events: all;
+  animation: toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.toast.removing { animation: toastOut 0.25s ease forwards; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(60px) scale(0.9); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(60px) scale(0.9); }
+}
+
+.toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+.toast-msg  { flex: 1; font-weight: 500; }
+
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red); }
+.toast.info    { border-left: 3px solid var(--teal); }
+.toast.warning { border-left: 3px solid var(--amber); }
+
+/* =============================================
+   SCROLLBAR
+   ============================================= */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--text-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-2); }
+
+/* =============================================
+   PULSE ANIMATION
+   ============================================= */
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,229,195,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(0,229,195,0); }
+}
+
+.pulse { animation: pulse 2s infinite; }
+</style>
+</head>
+<body>
+
+<!-- ==================== APP WRAPPER ==================== -->
+<div class="app-wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🔍</div>
+      <div class="logo-text">
+        <h1>Smart <span>Lost &amp; Found</span></h1>
+        <p>Drag · Drop · Locate · Recover</p>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-chip lost">
+        <div class="dot"></div>
+        <span class="count" id="statLost">0</span>
+        <span>Lost</span>
+      </div>
+      <div class="stat-chip found">
+        <div class="dot"></div>
+        <span class="count" id="statFound">0</span>
+        <span>Found</span>
+      </div>
+      <div class="stat-chip rec">
+        <div class="dot"></div>
+        <span class="count" id="statRec">0</span>
+        <span>Recovered</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOCATION BAR -->
+  <div class="location-bar">
+    <div class="icon">📡</div>
+    <div class="location-text">
+      <div class="label">Current Location</div>
+      <div class="value" id="locationValue">Not detected — click to fetch</div>
+    </div>
+    <button class="btn-geo" id="geoBtn" onclick="fetchLocation()">
+      <span>📍</span> Detect My Location
+    </button>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- ITEMS PANEL (LEFT) -->
+    <div class="panel" id="itemsPanel">
+      <div class="panel-title">🎒 Drag Items</div>
+
+      <!-- Item cards will be injected here -->
+      <div id="itemsList"></div>
+
+      <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--glass-border);">
+        <div class="panel-title" style="font-size:0.68rem;">ℹ️ How it works</div>
+        <p style="font-size:0.75rem; color:var(--text-2); line-height:1.6;">
+          Drag any item card into the <span style="color:var(--red)">Lost</span> or
+          <span style="color:var(--teal)">Found</span> zone. Fill in the report form.
+          All reports are saved automatically.
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+
+      <!-- DROP ZONES -->
+      <div class="drop-zones">
+        <div class="drop-zone lost" id="lostZone"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event,'lost')">
+          <div class="drop-zone-icon">😰</div>
+          <div class="drop-zone-label">Lost</div>
+          <div class="drop-zone-sub">Drop item here to<br>report it as lost</div>
+        </div>
+        <div class="drop-zone found" id="foundZone"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event,'found')">
+          <div class="drop-zone-icon">🎉</div>
+          <div class="drop-zone-label">Found</div>
+          <div class="drop-zone-sub">Drop item here to<br>report it as found</div>
+        </div>
+      </div>
+
+      <!-- REPORTS DASHBOARD -->
+      <div class="dashboard">
+        <div class="dashboard-header">
+          <div class="dashboard-title">📋 Reports Dashboard</div>
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search reports…" oninput="filterReports()" />
+          </div>
+        </div>
+        <div class="filter-btns">
+          <button class="filter-btn active" data-filter="all"   onclick="setFilter('all')">All</button>
+          <button class="filter-btn"        data-filter="lost"  onclick="setFilter('lost')">🔴 Lost</button>
+          <button class="filter-btn"        data-filter="found" onclick="setFilter('found')">🟢 Found</button>
+        </div>
+        <div class="reports-grid" id="reportsGrid">
+          <div class="empty-state">
+            <span class="emoji">📭</span>
+            <p>No reports yet. Drag an item into a zone to get started!</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.right-col -->
+  </div><!-- /.main-grid -->
+
+</div><!-- /.app-wrapper -->
+
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-header">
+      <div class="modal-emoji" id="modalEmoji">📱</div>
+      <div class="modal-header-text">
+        <h2 id="modalTitle">Report Item</h2>
+        <p id="modalSub">Fill in the details below</p>
+      </div>
+      <div class="modal-type-tag" id="modalTypeTag">Lost</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Timestamp</label>
+        <input type="text" id="fieldTimestamp" readonly />
+      </div>
+      <div class="form-group">
+        <label>Item</label>
+        <input type="text" id="fieldItem" readonly />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Description *</label>
+      <textarea id="fieldDesc" rows="3" placeholder="Describe the item (color, brand, distinguishing features…)"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Contact Information *</label>
+      <input type="text" id="fieldContact" placeholder="Phone / email / name…" />
+    </div>
+
+    <div class="attach-loc" onclick="document.getElementById('attachLocCb').click()">
+      <input type="checkbox" id="attachLocCb" onclick="event.stopPropagation()" />
+      <span>📍 Attach current location to this report</span>
+      <span style="margin-left:auto; font-size:0.72rem; color:var(--text-2)" id="attachLocText">—</span>
+    </div>
+
+    <!-- Image upload -->
+    <div class="form-group">
+      <label>Photo (optional)</label>
+      <div class="file-upload-wrap">
+        <input type="file" id="fieldImage" accept="image/*" onchange="previewImage()" />
+        <div class="file-upload-ui" id="fileUploadUI">
+          <span>📷</span>
+          <span id="fileLabel">Click or drag an image here</span>
+        </div>
+      </div>
+      <img id="imagePreview" style="display:none; width:100%; height:80px; object-fit:cover; border-radius:8px; margin-top:8px; border:1px solid var(--glass-border);" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitReport()">✅ Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST CONTAINER ==================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+/* ============================================================
+   DATA & STATE
+   ============================================================ */
+
+// Catalogue of draggable items
+const ITEMS = [
+  { id: 'phone',    emoji: '📱', name: 'Smartphone',   hint: 'Mobile device' },
+  { id: 'wallet',   emoji: '👛', name: 'Wallet',        hint: 'Cards & cash' },
+  { id: 'keys',     emoji: '🔑', name: 'Keys',          hint: 'House / car keys' },
+  { id: 'bag',      emoji: '👜', name: 'Bag / Purse',   hint: 'Handbag, backpack' },
+  { id: 'laptop',   emoji: '💻', name: 'Laptop',        hint: 'Computer device' },
+  { id: 'watch',    emoji: '⌚', name: 'Watch',         hint: 'Wristwatch' },
+  { id: 'glasses',  emoji: '👓', name: 'Glasses',       hint: 'Spectacles' },
+  { id: 'umbrella', emoji: '☂️',  name: 'Umbrella',     hint: 'Rain protection' },
+  { id: 'idcard',   emoji: '🪪', name: 'ID Card',       hint: 'Identity document' },
+  { id: 'headphone',emoji: '🎧', name: 'Headphones',    hint: 'Audio device' },
+];
+
+// App state
+let reports       = [];
+let currentFilter = 'all';
+let pendingDrop   = null;   // { itemId, type }
+let userLocation  = null;   // { lat, lon, display }
+let imageBase64   = null;
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  renderItemsPanel();
+  loadReports();
+  renderReports();
+  updateStats();
+}
+
+/* ============================================================
+   ITEMS PANEL
+   ============================================================ */
+function renderItemsPanel() {
+  const el = document.getElementById('itemsList');
+  el.innerHTML = ITEMS.map(item => `
+    <div class="item-card"
+         draggable="true"
+         data-id="${item.id}"
+         ondragstart="handleDragStart(event, '${item.id}')"
+         ondragend="handleDragEnd(event)">
+      <span class="item-emoji">${item.emoji}</span>
+      <div class="item-info">
+        <div class="name">${item.name}</div>
+        <div class="hint">${item.hint}</div>
+      </div>
+      <span class="drag-handle">⠿</span>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   DRAG & DROP API
+   ============================================================ */
+let draggingId = null;
+
+function handleDragStart(e, itemId) {
+  draggingId = itemId;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'copy';
+  e.dataTransfer.setData('text/plain', itemId);
+}
+
+function handleDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  draggingId = null;
+  document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function handleDrop(e, type) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const itemId = e.dataTransfer.getData('text/plain') || draggingId;
+  if (!itemId) return;
+  pendingDrop = { itemId, type };
+  openModal(itemId, type);
+}
+
+/* ============================================================
+   GEOLOCATION API
+   ============================================================ */
+function fetchLocation() {
+  const btn = document.getElementById('geoBtn');
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Detecting…';
+
+  if (!navigator.geolocation) {
+    showToast('Geolocation is not supported by your browser.', 'error');
+    btn.classList.remove('loading');
+    btn.innerHTML = '<span>📍</span> Detect My Location';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      userLocation = { lat: lat.toFixed(5), lon: lon.toFixed(5), display: `${lat.toFixed(4)}°, ${lon.toFixed(4)}°` };
+      document.getElementById('locationValue').textContent =
+        `Lat ${userLocation.lat}, Lon ${userLocation.lon}`;
+      updateAttachLocText();
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span>✅</span> Location Detected';
+      showToast('Location detected successfully!', 'success');
+
+      // Reverse geocode with a free API (no key needed for display string)
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+        .then(r => r.json())
+        .then(d => {
+          const label = d.display_name || userLocation.display;
+          const short = label.split(',').slice(0, 3).join(', ');
+          userLocation.display = short;
+          document.getElementById('locationValue').textContent = short;
+          updateAttachLocText();
+        })
+        .catch(() => {});
+    },
+    err => {
+      const msgs = {
+        1: 'Location access denied. Please allow location in browser settings.',
+        2: 'Location unavailable.',
+        3: 'Location request timed out.',
+      };
+      showToast(msgs[err.code] || 'Could not detect location.', 'error');
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span>📍</span> Detect My Location';
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+function updateAttachLocText() {
+  const el = document.getElementById('attachLocText');
+  el.textContent = userLocation ? userLocation.display : 'No location detected';
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal(itemId, type) {
+  const item = ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+
+  // Reset
+  document.getElementById('fieldDesc').value    = '';
+  document.getElementById('fieldContact').value = '';
+  document.getElementById('fieldImage').value   = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('fileLabel').textContent = 'Click or drag an image here';
+  document.getElementById('attachLocCb').checked = !!userLocation;
+  imageBase64 = null;
+
+  // Populate
+  document.getElementById('modalEmoji').textContent   = item.emoji;
+  document.getElementById('modalTitle').textContent   = `Report ${item.name}`;
+  document.getElementById('modalSub').textContent     = `Marking as ${type.toUpperCase()}`;
+  document.getElementById('fieldTimestamp').value     = new Date().toLocaleString();
+  document.getElementById('fieldItem').value          = item.name;
+
+  const tag = document.getElementById('modalTypeTag');
+  tag.textContent = type === 'lost' ? 'Lost' : 'Found';
+  tag.className   = `modal-type-tag ${type}`;
+
+  updateAttachLocText();
+
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('fieldDesc').focus(), 320);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  pendingDrop = null;
+  imageBase64 = null;
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Image preview
+function previewImage() {
+  const file = document.getElementById('fieldImage').files[0];
+  if (!file) return;
+  document.getElementById('fileLabel').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageBase64 = e.target.result;
+    const prev = document.getElementById('imagePreview');
+    prev.src = imageBase64;
+    prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
+   SUBMIT REPORT
+   ============================================================ */
+function submitReport() {
+  if (!pendingDrop) return;
+
+  const desc    = document.getElementById('fieldDesc').value.trim();
+  const contact = document.getElementById('fieldContact').value.trim();
+
+  if (!desc)    { showToast('Please add a description.', 'warning'); document.getElementById('fieldDesc').focus(); return; }
+  if (!contact) { showToast('Please add contact information.', 'warning'); document.getElementById('fieldContact').focus(); return; }
+
+  const item    = ITEMS.find(i => i.id === pendingDrop.itemId);
+  const attachLoc = document.getElementById('attachLocCb').checked;
+  const location  = (attachLoc && userLocation) ? userLocation.display : null;
+
+  const report = {
+    id:        Date.now().toString(),
+    itemId:    pendingDrop.itemId,
+    itemName:  item.name,
+    emoji:     item.emoji,
+    type:      pendingDrop.type,
+    desc,
+    contact,
+    location,
+    timestamp: new Date().toLocaleString(),
+    recovered: false,
+    image:     imageBase64 || null,
+  };
+
+  reports.unshift(report);
+  saveReports();
+  renderReports();
+  updateStats();
+  detectMatches(report);
+  closeModal();
+  showToast(`${item.emoji} ${item.name} reported as ${report.type}!`, 'success');
+}
+
+/* ============================================================
+   WEB STORAGE API — localStorage
+   ============================================================ */
+const STORAGE_KEY = 'smartLostFound_reports_v2';
+
+function saveReports() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+}
+
+function loadReports() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    reports = raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    reports = [];
+  }
+}
+
+/* ============================================================
+   RENDER REPORTS
+   ============================================================ */
+function renderReports() {
+  const grid   = document.getElementById('reportsGrid');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  let filtered = reports.filter(r => {
+    const matchFilter = currentFilter === 'all' || r.type === currentFilter;
+    const matchSearch = !search ||
+      r.itemName.toLowerCase().includes(search) ||
+      r.desc.toLowerCase().includes(search) ||
+      (r.contact && r.contact.toLowerCase().includes(search)) ||
+      (r.location && r.location.toLowerCase().includes(search));
+    return matchFilter && matchSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <span class="emoji">${search ? '🔍' : '📭'}</span>
+        <p>${search ? 'No reports match your search.' : 'No reports yet. Drag an item to get started!'}</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(r => buildReportCard(r)).join('');
+}
+
+function buildReportCard(r) {
+  const matchHtml = checkMatch(r);
+
+  return `
+  <div class="report-card ${r.type} ${r.recovered ? 'recovered' : ''}" id="card-${r.id}">
+    <div class="card-top">
+      <div class="card-left">
+        <span class="card-emoji">${r.emoji}</span>
+        <div>
+          <div class="card-name">${r.itemName}</div>
+          <div style="display:flex;gap:6px;margin-top:4px;align-items:center;">
+            <span class="status-tag ${r.type}">${r.type === 'lost' ? '😰 Lost' : '🎉 Found'}</span>
+            ${r.recovered ? '<span class="recovered-badge">✅ Recovered</span>' : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${r.image ? `<img class="card-img" src="${r.image}" alt="Item photo" />` : ''}
+
+    <div class="card-desc">${escapeHtml(r.desc)}</div>
+
+    <div class="card-meta">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${r.timestamp}
+      </div>
+      ${r.location ? `
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${escapeHtml(r.location)}
+      </div>` : ''}
+    </div>
+
+    <div class="card-contact">
+      <span>📞</span> ${escapeHtml(r.contact)}
+    </div>
+
+    ${matchHtml}
+
+    <div class="card-actions">
+      <button class="btn-recovered ${r.recovered ? 'unmark' : 'mark'}"
+              onclick="toggleRecovered('${r.id}')">
+        ${r.recovered ? '↩️ Mark Active' : '✅ Mark Recovered'}
+      </button>
+      <button class="btn-delete" onclick="deleteReport('${r.id}')" title="Delete">🗑</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   MATCH DETECTION
+   ============================================================ */
+function checkMatch(report) {
+  if (report.recovered) return '';
+  const opposite = report.type === 'lost' ? 'found' : 'lost';
+  const match = reports.find(r =>
+    r.id !== report.id &&
+    r.itemId === report.itemId &&
+    r.type === opposite &&
+    !r.recovered
+  );
+  if (!match) return '';
+  return `
+    <div class="match-indicator">
+      ⚡ Possible match: Someone ${opposite} this item! Check report #${match.id.slice(-4)}.
+    </div>`;
+}
+
+function detectMatches(newReport) {
+  const opposite = newReport.type === 'lost' ? 'found' : 'lost';
+  const match = reports.find(r =>
+    r.id !== newReport.id &&
+    r.itemId === newReport.itemId &&
+    r.type === opposite &&
+    !r.recovered
+  );
+  if (match) {
+    showToast(`⚡ Possible match found! A ${newReport.itemName} was ${opposite} nearby.`, 'warning');
+  }
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+function toggleRecovered(id) {
+  const r = reports.find(r => r.id === id);
+  if (!r) return;
+  r.recovered = !r.recovered;
+  saveReports();
+  renderReports();
+  updateStats();
+  showToast(r.recovered ? `✅ Marked as recovered!` : `↩️ Marked as active.`,
+            r.recovered ? 'success' : 'info');
+}
+
+function deleteReport(id) {
+  reports = reports.filter(r => r.id !== id);
+  saveReports();
+  renderReports();
+  updateStats();
+  showToast('🗑 Report deleted.', 'info');
+}
+
+/* ============================================================
+   FILTER & SEARCH
+   ============================================================ */
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === f);
+  });
+  renderReports();
+}
+
+function filterReports() { renderReports(); }
+
+/* ============================================================
+   STATS
+   ============================================================ */
+function updateStats() {
+  document.getElementById('statLost').textContent  = reports.filter(r => r.type === 'lost'  && !r.recovered).length;
+  document.getElementById('statFound').textContent = reports.filter(r => r.type === 'found' && !r.recovered).length;
+  document.getElementById('statRec').textContent   = reports.filter(r => r.recovered).length;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+function showToast(msg, type = 'info') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-msg">${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('removing');
+    toast.addEventListener('animationend', () => toast.remove());
+  }, 3500);
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+init();
+</script>
+</body>
+</html>
